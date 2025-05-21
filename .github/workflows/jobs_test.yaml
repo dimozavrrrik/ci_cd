@@ -1,4 +1,4 @@
-name: golang-test
+name: test 
 on: push
 jobs:
   test:
@@ -7,9 +7,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Unit Tests
-        run: GOOS=linux GOARCH=amd64 go test
-
       - name: Vet
         run: |
           go vet ./...
+
+      - name: Run Unit Tests
+        run: GOOS=linux GOARCH=amd64 go test
+
+      
