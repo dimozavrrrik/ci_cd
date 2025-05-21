@@ -1,31 +1,39 @@
-deploy:
-    name: Push Docker image to Docker Hub
+name: Deploy image
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy:
+    name: Push Docker image
     runs-on: ubuntu-latest
-    needs: test
-    if: startsWith(github.ref, 'refs/tags')
+    if: $ {{startsWith(github.ref, 'refs/tags/')}}
+
     steps:
-      - name: Checkout
+      - name: Checkout     
         uses: actions/checkout@v4
 
-      - name: Set up Docker buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          username: $ {{secrets.DOCKERHUB_USERNAME}}
+          password: $ {{secrets.DOCKERHUB_TOKEN}}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Metadata for Docker
         id: meta
         uses: docker/metadata-action@v5.5.1
         with:
-          images: dimozavrrrik/hello-golang
+          images: $ {{secrets.DOCKERHUB_USERNAME}}/ci_cd
 
-      - name: Build and push Docker Image
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }} 
+          push: true      
+          tags: ${{steps.meta.outputs.tags}}
+          labels: ${{steps.meta.outputs.labels}}  
